@@ -195,8 +195,12 @@ class City(models.Model):
 class PriceCalculation(models.Model):
     """Store price calculations for different routes"""
 
-    pickup_location = models.CharField(max_length=200)
-    dropoff_location = models.CharField(max_length=200)
+    pickup_location = models.ForeignKey(
+        City, related_name="pickup_location", on_delete=models.CASCADE, null=True
+    )
+    dropoff_location = models.ForeignKey(
+        City, related_name="dropoff_location", on_delete=models.CASCADE, null=True
+    )
     equipment = models.CharField(max_length=20, choices=Shipment.EQUIPMENT_CHOICES)
 
     # Distance and pricing data
@@ -212,6 +216,8 @@ class PriceCalculation(models.Model):
 
     class Meta:
         unique_together = ["pickup_location", "dropoff_location", "equipment"]
+        db_table = "price_calculations"
+        verbose_name_plural = "price_calculations"
 
     def __str__(self):
         return f"{self.pickup_location} to {self.dropoff_location} - {self.miles}mi - ${self.base_price}"
