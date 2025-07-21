@@ -166,43 +166,13 @@ def calculate_distance_price(request):
         )
 
 
-def _calculate_mock_distance(pickup, dropoff):
+def _calculate_distance(pickup, dropoff):
     """
-    Mock distance calculation - in production, this would use Google Maps API
-    or another geocoding service
+    Distance calculation
     """
-    # Extract state codes for rough distance estimation
-    pickup_parts = pickup.split(",")
-    dropoff_parts = dropoff.split(",")
-
-    if len(pickup_parts) < 2 or len(dropoff_parts) < 2:
-        return 500  # Default distance
-
-    pickup_state = pickup_parts[1].strip()
-    dropoff_state = dropoff_parts[1].strip()
-
-    # Very basic state-to-state distance mapping (simplified)
-    state_distances = {
-        ("CA", "NY"): 2900,
-        ("NY", "CA"): 2900,
-        ("FL", "WA"): 3100,
-        ("WA", "FL"): 3100,
-        ("TX", "ME"): 2100,
-        ("ME", "TX"): 2100,
-    }
-
-    # Same state
-    if pickup_state == dropoff_state:
-        return 150
-
-    # Check predefined distances
-    key = (pickup_state, dropoff_state)
-    if key in state_distances:
-        return state_distances[key]
-
-    # Default calculation based on hash of locations
-    hash_value = hash(pickup + dropoff) % 2500
-    return max(100, abs(hash_value))
+    return geo_api_get(f"cities/{pickup}/distance", params={"toCityId": dropoff})[
+        "data"
+    ]
 
 
 def _calculate_base_price(miles, equipment):
