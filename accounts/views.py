@@ -39,7 +39,10 @@ def register_step_one(request):
 
         user_serializer = UserSerializer(user)
 
-        send_verification_email(user)
+        try:
+            send_verification_email(user)
+        except Exception:
+            pass
 
         return Response(
             {
