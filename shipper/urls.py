@@ -11,6 +11,11 @@ urlpatterns = [
         name="create_shipping_needs",
     ),
     path(
+        "shipper/cities/",
+        views.search_cities,
+        name="search_cities",
+    ),
+    path(
         "shipper/country-regions/",
         views.get_regions,
         name="get_country_regions",
