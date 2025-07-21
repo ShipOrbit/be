@@ -1,0 +1,12 @@
+asgiref==3.8.1
+backports.zoneinfo==0.2.1;python_version<"3.9"
+django==4.2.23
+django-cors-headers==4.4.0
+djangorestframework==3.15.2
+psycopg==3.2.9
+sqlparse==0.5.3
+typing-extensions==4.13.2
+djangorestframework==3.15.2
+python-decouple==3.8
+resend==2.11.0
+gunicorn==23.0.0
