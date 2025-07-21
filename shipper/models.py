@@ -71,7 +71,7 @@ class Shipment(models.Model):
 
     EQUIPMENT_CHOICES = [
         ("dryVan", "Dry Van"),
-        ("refeer", "Reefer"),
+        ("reefer", "Reefer"),
     ]
 
     # Basic Info
