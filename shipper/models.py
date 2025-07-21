@@ -178,6 +178,20 @@ class Location(models.Model):
         return f"{self.location_type.title()} - {self.city}, {self.state}"
 
 
+class City(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    region_code = models.CharField(max_length=20)
+    country_code = models.CharField(max_length=20)
+
+    class Meta:
+        db_table = "cities"
+        verbose_name_plural = "cities"
+
+    def __str__(self):
+        return f"{self.name} ({self.region_code})"
+
+
 class PriceCalculation(models.Model):
     """Store price calculations for different routes"""
 
