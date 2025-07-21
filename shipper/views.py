@@ -161,7 +161,7 @@ def calculate_distance_price(request):
 
     except Exception as e:
         return Response(
-            {"error": f"Unable to calculate distance and price: {str(e)}"},
+            {"message": f"Unable to calculate distance and price: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
