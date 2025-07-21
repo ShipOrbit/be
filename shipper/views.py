@@ -391,21 +391,13 @@ def search_cities(request, country_code):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def calculate_distance(request):
-    from_city_id = request.GET.get("fromCityId")
-    to_city_id = request.GET.get("toCityId")
-
-    if not from_city_id or not to_city_id:
-        return Response(
-            {"error": "Missing fromCityId or toCityId"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
+def search_cities(request):
+    name_prefix = request.GET.get("name_prefix", "")
     try:
-        data = geo_api_get(
-            f"cities/{from_city_id}/distance", params={"toCityId": to_city_id}
+        data = geo_api_get("cities", params={"namePrefix": name_prefix})
+        return Response(
+            data.get("data", []),
         )
-        return Response(data)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
