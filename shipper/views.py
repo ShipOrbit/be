@@ -368,14 +368,25 @@ def get_regions(request):
 def search_cities(request, country_code):
     name_prefix = request.GET.get("namePrefix", "")
     try:
-        data = geo_api_get(
-            f"countries/{country_code}/cities", params={"namePrefix": name_prefix}
+        return City.objects.get(id=city_id)
+    except City.DoesNotExist:
+        # Step 2: Fetch from GeoDB API
+        city_data = geo_api_get(f"cities/{city_id}/locatedIn")
+
+        # Extract required data
+        name = city_data["data"]["city"]
+        region_code = city_data["data"].get("regionCode", "")
+        country_code = city_data["data"].get("countryCode", "")
+
+        # Step 3: Save to DB
+        city = City.objects.create(
+            id=city_id,
+            name=name,
+            region_code=region_code,
+            country_code=country_code,
         )
-        return Response(
-            data.get("data", []),
-        )
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return city
 
 
 @api_view(["GET"])
