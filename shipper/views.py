@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from accounts.serializers import UserSerializer
 from utils.geodb import geo_api_get
 
-from .models import Location, PriceCalculation, Shipment, ShipmentStatusHistory
+from .models import Location, PriceCalculation, Shipment, ShipmentStatusHistory, City
 from .serializers import (
     DistancePriceRequestSerializer,
     DistancePriceResponseSerializer,
@@ -93,52 +93,53 @@ class ShipmentUpdateStep3View(generics.UpdateAPIView):
 def calculate_distance_price(request):
     """
     Calculate distance and pricing between two locations
-    This replaces the Google Maps API functionality from the original app
     """
     serializer = DistancePriceRequestSerializer(data=request.data)
+
     if not serializer.is_valid():
         return Response(
             {"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    pickup_location = serializer.validated_data["pickup_location"]
-    dropoff_location = serializer.validated_data["dropoff_location"]
+    pickup_location_data = serializer.validated_data["pickup_location"]
+    dropoff_location_data = serializer.validated_data["dropoff_location"]
     equipment = serializer.validated_data["equipment"]
-
-    # Check if we have a cached calculation
-    cached_calculation = PriceCalculation.objects.filter(
-        pickup_location=pickup_location,
-        dropoff_location=dropoff_location,
-        equipment=equipment,
-    ).first()
-
-    if cached_calculation:
-        response_data = {
-            "pickup_location": pickup_location,
-            "dropoff_location": dropoff_location,
-            "equipment": equipment,
-            "miles": cached_calculation.miles,
-            "base_price": cached_calculation.base_price,
-            "min_transit_time": cached_calculation.min_transit_time,
-            "driver_assist_fee": Decimal("150.00"),
-            "total_price_with_assist": cached_calculation.base_price
-            + Decimal("150.00"),
-        }
-        response_serializer = DistancePriceResponseSerializer(response_data)
-        return Response(response_serializer.data)
-
-    # Calculate new distance and pricing
     try:
-        # This would integrate with a real geocoding/distance API
-        # For now, using mock calculation based on location names
-        distance_miles = _calculate_mock_distance(pickup_location, dropoff_location)
+        pickup_city = get_or_create_city(pickup_location_data)
+        dropoff_city = get_or_create_city(dropoff_location_data)
+
+        # Check if we have a cached calculation
+        cached_calculation = PriceCalculation.objects.filter(
+            pickup_location=pickup_city,
+            dropoff_location=dropoff_city,
+            equipment=equipment,
+        ).first()
+
+        if cached_calculation:
+            response_data = {
+                "pickup_location": pickup_city,
+                "dropoff_location": dropoff_city,
+                "equipment": equipment,
+                "miles": cached_calculation.miles,
+                "base_price": cached_calculation.base_price,
+                "min_transit_time": cached_calculation.min_transit_time,
+                "driver_assist_fee": Decimal("150.00"),
+                "total_price_with_assist": cached_calculation.base_price
+                + Decimal("150.00"),
+            }
+            response_serializer = DistancePriceResponseSerializer(response_data)
+            return Response(response_serializer.data)
+
+        distance_miles = _calculate_distance(
+            pickup_location_data, dropoff_location_data
+        )
         base_price = _calculate_base_price(distance_miles, equipment)
         min_transit_days = _calculate_transit_time(distance_miles)
 
         # Cache the calculation
         PriceCalculation.objects.create(
-            pickup_location=pickup_location,
-            dropoff_location=dropoff_location,
+            pickup_location=pickup_city,
+            dropoff_location=dropoff_city,
             equipment=equipment,
             miles=distance_miles,
             base_price=base_price,
@@ -146,8 +147,8 @@ def calculate_distance_price(request):
         )
 
         response_data = {
-            "pickup_location": pickup_location,
-            "dropoff_location": dropoff_location,
+            "pickup_location": pickup_location_data,
+            "dropoff_location": dropoff_location_data,
             "equipment": equipment,
             "miles": distance_miles,
             "base_price": base_price,
