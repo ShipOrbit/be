@@ -362,10 +362,8 @@ def get_regions(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def search_cities(request, country_code):
-    name_prefix = request.GET.get("namePrefix", "")
+def get_or_create_city(city_id):
+    # Step 1: Check if city already exists in your DB
     try:
         return City.objects.get(id=city_id)
     except City.DoesNotExist:
