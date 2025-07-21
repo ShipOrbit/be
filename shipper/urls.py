@@ -13,6 +13,11 @@ urlpatterns = [
     path(
         "shipper/country-regions/",
         views.get_regions,
-        name="create_shipping_needs",
+        name="get_country_regions",
+    ),
+    path(
+        "shipper/distance-price/",
+        views.calculate_distance_price,
+        name="get_distance_price",
     ),
 ]
