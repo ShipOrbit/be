@@ -212,7 +212,7 @@ def _calculate_base_price(miles, equipment):
     # Equipment multiplier
     equipment_multipliers = {
         "dryVan": Decimal("1.0"),
-        "refeer": Decimal("1.3"),  # Reefer costs more
+        "reefer": Decimal("1.3"),  # Reefer costs more
     }
 
     multiplier = equipment_multipliers.get(equipment, Decimal("1.0"))
