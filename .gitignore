@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+*.egg-info/
+dist/
+build/
+
+# Django
+*.sqlite3
+db.sqlite3
+/media/
+/staticfiles/
+/static_root/
+/.env
+.env.*
+.envrc
+.venv
+
+# Migrations (optional: include only if you don't want to version migrations early on)
+/*/migrations/*.py
+!*/migrations/__init__.py
+
+# VS Code
+.vscode/
+
+# Mac / Linux / Windows
+.DS_Store
+Thumbs.db
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Logs
+*.log
+
+# Coverage / testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Requirements lock
+poetry.lock
+Pipfile.lock
