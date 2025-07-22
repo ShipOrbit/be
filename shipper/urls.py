@@ -1,5 +1,18 @@
 from django.urls import path
 from . import views
+from .views import (
+    ShipmentListCreateView,
+    ShipmentDetailView,
+    ShipmentUpdateStep2View,
+    ShipmentUpdateStep3View,
+    calculate_distance_price,
+    update_shipment_status,
+    ShipmentStatusHistoryView,
+    shipment_dashboard,
+    save_draft_shipment,
+    LocationListView,
+    price_calculation_history,
+)
 
 # App URLs (accounts/urls.py)
 app_name = "shipper"
@@ -24,5 +37,64 @@ urlpatterns = [
         "shipper/distance-price/",
         views.calculate_distance_price,
         name="get_distance_price",
+    ),
+    path(
+        "shipper/shipments/",
+        ShipmentListCreateView.as_view(),
+        name="shipment_list_create",
+    ),
+    path(
+        "shipper/shipments/<int:pk>/",
+        ShipmentDetailView.as_view(),
+        name="shipment-detail",
+    ),
+    # Multi-step shipment creation
+    path(
+        "shipper/shipments/<int:pk>/step2/",
+        ShipmentUpdateStep2View.as_view(),
+        name="shipment-step2",
+    ),
+    path(
+        "shipper/shipments/<int:pk>/step3/",
+        ShipmentUpdateStep3View.as_view(),
+        name="shipment-step3",
+    ),
+    # Distance and price calculation
+    path(
+        "shipper/shipments/calculate/",
+        calculate_distance_price,
+        name="calculate-distance-price",
+    ),
+    # Update status
+    path(
+        "shipper/shipments/<int:shipment_id>/status/",
+        update_shipment_status,
+        name="update-shipment-status",
+    ),
+    # Status history
+    path(
+        "shipper/shipments/<int:shipment_id>/history/",
+        ShipmentStatusHistoryView.as_view(),
+        name="shipment-status-history",
+    ),
+    # Dashboard
+    path("shipper/shipments/dashboard/", shipment_dashboard, name="shipment-dashboard"),
+    # Save as draft
+    path(
+        "shipper/shipments/<int:shipment_id>/save-draft/",
+        save_draft_shipment,
+        name="save-draft-shipment",
+    ),
+    # Locations
+    path(
+        "shipper/shipments/<int:shipment_id>/locations/",
+        LocationListView.as_view(),
+        name="shipment-locations",
+    ),
+    # Price calculation history
+    path(
+        "shipper/shipments/price-history/",
+        price_calculation_history,
+        name="price-calculation-history",
     ),
 ]
