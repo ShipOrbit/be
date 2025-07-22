@@ -9,7 +9,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.serializers import UserSerializer
-from shipper.util import calculate_distance, calculate_transit_time, get_or_create_city
+from shipper.util import (
+    calculate_base_price,
+    calculate_distance,
+    calculate_transit_time,
+    get_or_create_city,
+)
 from utils.geodb import geo_api_get
 
 from .models import Location, PriceCalculation, Shipment, ShipmentStatusHistory
@@ -131,7 +136,7 @@ def calculate_distance_price(request):
             return Response(response_serializer.data)
 
         distance_miles = calculate_distance(pickup_location_data, dropoff_location_data)
-        base_price = _calculate_base_price(distance_miles, equipment)
+        base_price = calculate_base_price(distance_miles, equipment)
         min_transit_days = calculate_transit_time(distance_miles)
 
         # Cache the calculation
@@ -163,23 +168,6 @@ def calculate_distance_price(request):
             {"message": f"Unable to calculate distance and price: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
-
-def _calculate_base_price(miles, equipment):
-    """Calculate base price based on distance and equipment type"""
-    base_rate_per_mile = Decimal("2.50")
-
-    # Equipment multiplier
-    equipment_multipliers = {
-        "dryVan": Decimal("1.0"),
-        "reefer": Decimal("1.3"),  # Reefer costs more
-    }
-
-    multiplier = equipment_multipliers.get(equipment, Decimal("1.0"))
-    base_fee = Decimal("500.00")  # Minimum fee
-
-    calculated_price = (Decimal(miles) * base_rate_per_mile * multiplier) + base_fee
-    return round(calculated_price, 2)
 
 
 @api_view(["POST"])
