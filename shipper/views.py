@@ -34,8 +34,8 @@ from .serializers import (
 
 class ShipmentListCreateView(generics.ListCreateAPIView):
     """
-    GET: List user's shipments with filtering by status
-    POST: Create new shipment (Step 1)
+    GET: List user's shipments with optional filtering
+    POST: Create new shipment with pickup and dropoff locations
     """
 
     permission_classes = [IsAuthenticated]
@@ -48,14 +48,21 @@ class ShipmentListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         queryset = Shipment.objects.filter(user=self.request.user)
         status_filter = self.request.query_params.get("status", None)
-
         if status_filter:
             queryset = queryset.filter(status=status_filter)
-
         return queryset
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        shipment = serializer.save()
+
+        return Response(
+            {"id": shipment.id},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class ShipmentDetailView(generics.RetrieveUpdateDestroyAPIView):
