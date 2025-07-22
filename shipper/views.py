@@ -8,9 +8,9 @@ from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from math import radians, cos, sin, sqrt, atan2
 
 from accounts.serializers import UserSerializer
+from shipper.util import calculate_distance
 from utils.geodb import geo_api_get
 
 from .models import Location, PriceCalculation, Shipment, ShipmentStatusHistory, City
@@ -131,9 +131,7 @@ def calculate_distance_price(request):
             response_serializer = DistancePriceResponseSerializer(response_data)
             return Response(response_serializer.data)
 
-        distance_miles = _calculate_distance(
-            pickup_location_data, dropoff_location_data
-        )
+        distance_miles = calculate_distance(pickup_location_data, dropoff_location_data)
         base_price = _calculate_base_price(distance_miles, equipment)
         min_transit_days = _calculate_transit_time(distance_miles)
 
@@ -166,29 +164,6 @@ def calculate_distance_price(request):
             {"message": f"Unable to calculate distance and price: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
-
-def _calculate_distance(pickup, dropoff):
-    """
-    Calculate the distance between two cities using the Haversine formula
-    Input: pickup and dropoff are dictionaries with latitude and longitude
-    Returns: distance in miles
-    """
-    R = 3958.8  # Radius of Earth in miles
-
-    lat1 = radians(pickup["latitude"])
-    lon1 = radians(pickup["longitude"])
-    lat2 = radians(dropoff["latitude"])
-    lon2 = radians(dropoff["longitude"])
-
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-    distance = R * c
-    return round(distance, 2)
 
 
 def _calculate_base_price(miles, equipment):
