@@ -348,20 +348,21 @@ def get_regions(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def get_or_create_city(city_id):
-    # Step 1: Check if city already exists in your DB
+def get_or_create_city(city_data):
+    city_id = city_data["id"]
+
     try:
         return City.objects.get(id=city_id)
     except City.DoesNotExist:
-        # Step 2: Fetch from GeoDB API
         # Extract required fields
         name = city_data["name"]
         region_code = city_data.get("regionCode", "")
         country_code = city_data.get("countryCode", "")
         latitude = city_data.get("latitude")
         longitude = city_data.get("longitude")
-        # Step 3: Save to DB
-        city = City.objects.create(
+
+        # Create city in DB
+        return City.objects.create(
             id=city_id,
             name=name,
             region_code=region_code,
