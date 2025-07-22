@@ -9,12 +9,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.serializers import UserSerializer
-from shipper.util import (
-    calculate_base_price,
-    calculate_distance,
-    calculate_transit_time,
-    get_or_create_city,
-)
+
+from shipper.util.calculate_base_price import calculate_base_price
+from shipper.util.calculate_distance import calculate_distance
+from shipper.util.calculate_transit_time import calculate_transit_time
+from shipper.util.get_or_create_city import get_or_create_city
 from utils.geodb import geo_api_get
 
 from .models import Location, PriceCalculation, Shipment, ShipmentStatusHistory
