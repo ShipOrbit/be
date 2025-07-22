@@ -8,6 +8,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from math import radians, cos, sin, sqrt, atan2
 
 from accounts.serializers import UserSerializer
 from utils.geodb import geo_api_get
@@ -169,11 +170,25 @@ def calculate_distance_price(request):
 
 def _calculate_distance(pickup, dropoff):
     """
-    Distance calculation
+    Calculate the distance between two cities using the Haversine formula
+    Input: pickup and dropoff are dictionaries with latitude and longitude
+    Returns: distance in miles
     """
-    return geo_api_get(f"cities/{pickup}/distance", params={"toCityId": dropoff})[
-        "data"
-    ]
+    R = 3958.8  # Radius of Earth in miles
+
+    lat1 = radians(pickup["latitude"])
+    lon1 = radians(pickup["longitude"])
+    lat2 = radians(dropoff["latitude"])
+    lon2 = radians(dropoff["longitude"])
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c
+    return round(distance, 2)
 
 
 def _calculate_base_price(miles, equipment):
