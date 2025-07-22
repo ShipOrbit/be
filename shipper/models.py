@@ -100,15 +100,7 @@ class Shipment(models.Model):
         max_length=20, choices=EQUIPMENT_CHOICES, default="dryVan"
     )
 
-    # Locations
-    pickup_location = models.CharField(max_length=200)
-    dropoff_location = models.CharField(max_length=200)
-
-    # Dates
-    pickup_date = models.DateField()
-    dropoff_date = models.DateField()
-
-    # Pricing
+    # Pricing and Transit
     base_price = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
@@ -116,8 +108,6 @@ class Shipment(models.Model):
     driver_assist_fee = models.DecimalField(
         max_digits=10, decimal_places=2, default=150.00
     )
-
-    # Distance and Transit
     miles = models.PositiveIntegerField(null=True, blank=True)
     min_transit_time = models.PositiveIntegerField(null=True, blank=True)  # in days
 
@@ -136,7 +126,17 @@ class Shipment(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Shipment {self.id} - {self.pickup_location} to {self.dropoff_location}"
+        return f"Shipment {self.id}"
+
+    @property
+    def pickup_location(self):
+        pickup = self.locations.filter(location_type="pickup").first()
+        return pickup.city if pickup else None
+
+    @property
+    def dropoff_location(self):
+        dropoff = self.locations.filter(location_type="dropoff").first()
+        return dropoff.city if dropoff else None
 
     @property
     def total_price(self):
@@ -162,6 +162,8 @@ class Location(models.Model):
     facility_address = models.CharField(max_length=300, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     zip_code = models.CharField(max_length=20, blank=True)
+
+    date = models.DateField(null=True, blank=True)
 
     # Contact Info
     contact_name = models.CharField(max_length=200, blank=True)
