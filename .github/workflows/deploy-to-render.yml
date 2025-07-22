@@ -1,0 +1,38 @@
+name: Build & Deploy to Render
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/shiporbit
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Read custom version from VERSION
+        id: vars
+        run: |
+          VERSION=$(cat VERSION)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker image with custom and latest tags
+        run: |
+          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:${{ steps.vars.outputs.VERSION }} .
+
+      - name: Push both tags
+        run: |
+          docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:${{ steps.vars.outputs.VERSION }}
+
+      - name: Trigger Render Deployment
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
