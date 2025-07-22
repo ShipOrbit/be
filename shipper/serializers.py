@@ -270,11 +270,20 @@ class PriceCalculationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CityDataSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    name = serializers.CharField()
+    region_code = serializers.CharField(required=False, allow_blank=True)
+    country_code = serializers.CharField(required=False, allow_blank=True)
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+
+
 class DistancePriceRequestSerializer(serializers.Serializer):
     """Serializer for distance/price calculation requests"""
 
-    pickup_location = serializers.CharField(max_length=200)
-    dropoff_location = serializers.CharField(max_length=200)
+    pickup_location = CityDataSerializer()
+    dropoff_location = CityDataSerializer()
     equipment = serializers.ChoiceField(
         choices=Shipment.EQUIPMENT_CHOICES, default="dryVan"
     )
