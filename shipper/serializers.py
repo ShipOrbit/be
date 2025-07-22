@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from .models import (
     Shipment,
     Location,
     PriceCalculation,
     ShipmentStatusHistory,
     ShippingNeeds,
+    City,
 )
 import re
 
@@ -48,25 +48,39 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class ShipmentListSerializer(serializers.ModelSerializer):
-    """Serializer for shipment list view"""
+    """Serializer for listing shipments with pickup and dropoff info"""
 
     total_price = serializers.ReadOnlyField()
+
+    # Custom fields
+    pickup = serializers.SerializerMethodField()
+    dropoff = serializers.SerializerMethodField()
 
     class Meta:
         model = Shipment
         fields = [
             "id",
             "status",
-            "pickup_location",
-            "dropoff_location",
-            "pickup_date",
-            "dropoff_date",
+            "pickup",
+            "dropoff",
             "base_price",
             "total_price",
             "miles",
             "equipment",
             "created_at",
         ]
+
+    def get_pickup(self, obj):
+        pickup = obj.locations.filter(location_type="pickup").first()
+        if not pickup:
+            return None
+        return ListLocationSerializer(pickup).data
+
+    def get_dropoff(self, obj):
+        dropoff = obj.locations.filter(location_type="dropoff").first()
+        if not dropoff:
+            return None
+        return ListLocationSerializer(dropoff).data
 
 
 class ShipmentDetailSerializer(serializers.ModelSerializer):
@@ -119,36 +133,60 @@ class ShipmentDetailSerializer(serializers.ModelSerializer):
         return data
 
 
+class LocationCreateSerializer(serializers.Serializer):
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
+    date = serializers.DateField()
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ["id", "name", "region_code"]
+
+
+class ListLocationSerializer(serializers.ModelSerializer):
+    city = CitySerializer(read_only=True)  # Get full nested city details
+
+    class Meta:
+        model = Location
+        exclude = ["shipment", "id", "created_at"]
+        # Or: fields = "__all__" if you want everything
+
+
 class ShipmentCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating new shipments (Step 1)"""
+    pickup = LocationCreateSerializer()
+    dropoff = LocationCreateSerializer()
 
     class Meta:
         model = Shipment
-        fields = [
-            "equipment",
-            "pickup_location",
-            "dropoff_location",
-            "pickup_date",
-            "dropoff_date",
-        ]
+        fields = ["equipment", "pickup", "dropoff"]
 
-    def validate_pickup_location(self, value):
-        # Validate format: "City, State"
-        location_pattern = r"^[a-zA-Z\s\.]{1,50},\s*[a-zA-Z\s]{2,}$"
-        if not re.match(location_pattern, value.strip()):
-            raise serializers.ValidationError(
-                "Location must be in format: 'City, State'"
-            )
-        return value.strip()
+    def create(self, validated_data):
+        pickup_data = validated_data.pop("pickup")
+        dropoff_data = validated_data.pop("dropoff")
 
-    def validate_dropoff_location(self, value):
-        # Same validation as pickup_location
-        location_pattern = r"^[a-zA-Z\s\.]{1,50},\s*[a-zA-Z\s]{2,}$"
-        if not re.match(location_pattern, value.strip()):
-            raise serializers.ValidationError(
-                "Location must be in format: 'City, State'"
-            )
-        return value.strip()
+        # Create Shipment
+        shipment = Shipment.objects.create(
+            user=self.context["request"].user, **validated_data
+        )
+
+        # Create Pickup Location
+        Location.objects.create(
+            shipment=shipment,
+            location_type="pickup",
+            city=pickup_data["city"],
+            date=pickup_data["date"],
+        )
+
+        # Create Dropoff Location
+        Location.objects.create(
+            shipment=shipment,
+            location_type="dropoff",
+            city=dropoff_data["city"],
+            date=dropoff_data["date"],
+        )
+
+        return shipment
 
 
 class ShipmentUpdateStep2Serializer(serializers.ModelSerializer):
