@@ -1,4 +1,3 @@
-import math
 from datetime import timedelta
 from decimal import Decimal
 
@@ -10,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.serializers import UserSerializer
-from shipper.util import calculate_distance
+from shipper.util import calculate_distance, calculate_transit_time
 from utils.geodb import geo_api_get
 
 from .models import Location, PriceCalculation, Shipment, ShipmentStatusHistory, City
@@ -133,7 +132,7 @@ def calculate_distance_price(request):
 
         distance_miles = calculate_distance(pickup_location_data, dropoff_location_data)
         base_price = _calculate_base_price(distance_miles, equipment)
-        min_transit_days = _calculate_transit_time(distance_miles)
+        min_transit_days = calculate_transit_time(distance_miles)
 
         # Cache the calculation
         PriceCalculation.objects.create(
@@ -181,13 +180,6 @@ def _calculate_base_price(miles, equipment):
 
     calculated_price = (Decimal(miles) * base_rate_per_mile * multiplier) + base_fee
     return round(calculated_price, 2)
-
-
-def _calculate_transit_time(miles):
-    """Calculate minimum transit time in days based on distance"""
-    # Assume average speed of 500 miles per day including stops
-    days = math.ceil(miles / 500)
-    return max(1, days)
 
 
 @api_view(["POST"])
