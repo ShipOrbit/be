@@ -181,15 +181,17 @@ class Location(models.Model):
 class City(models.Model):
     id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
-    region_code = models.CharField(max_length=20)
-    country_code = models.CharField(max_length=20)
+    region_code = models.CharField(max_length=20, blank=True)
+    country_code = models.CharField(max_length=20, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
     class Meta:
         db_table = "cities"
         verbose_name_plural = "cities"
 
     def __str__(self):
-        return f"{self.name} ({self.region_code})"
+        return f"{self.name} ({self.region_code}, {self.country_code})"
 
 
 class PriceCalculation(models.Model):
