@@ -5,6 +5,22 @@ from django.db import models
 from accounts.models import User
 
 
+class City(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    region_code = models.CharField(max_length=20, blank=True)
+    country_code = models.CharField(max_length=20, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        db_table = "cities"
+        verbose_name_plural = "cities"
+
+    def __str__(self):
+        return f"{self.name} ({self.region_code}, {self.country_code})"
+
+
 class Company(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="company")
@@ -176,22 +192,6 @@ class Location(models.Model):
 
     def __str__(self):
         return f"{self.location_type.title()} - {self.city}, {self.state}"
-
-
-class City(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    name = models.CharField(max_length=255)
-    region_code = models.CharField(max_length=20, blank=True)
-    country_code = models.CharField(max_length=20, blank=True)
-    latitude = models.FloatField(null=True, blank=True)
-    longitude = models.FloatField(null=True, blank=True)
-
-    class Meta:
-        db_table = "cities"
-        verbose_name_plural = "cities"
-
-    def __str__(self):
-        return f"{self.name} ({self.region_code}, {self.country_code})"
 
 
 class PriceCalculation(models.Model):
