@@ -9,8 +9,10 @@ def get_or_create_city(city_data):
     except City.DoesNotExist:
         # Extract required fields
         name = city_data["name"]
-        region_code = city_data.get("regionCode", "")
-        country_code = city_data.get("countryCode", "")
+        region_code = city_data.get(
+            "region_code",
+        )
+        country_code = city_data.get("country_code")
         latitude = city_data.get("latitude")
         longitude = city_data.get("longitude")
 
