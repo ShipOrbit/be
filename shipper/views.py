@@ -307,12 +307,29 @@ def get_regions(request):
 def search_cities(request):
     name_prefix = request.GET.get("name_prefix", "")
     try:
-        data = geo_api_get("cities", params={"namePrefix": name_prefix})
-        return Response(
-            data.get("data", []),
-        )
+        response = geo_api_get("cities", params={"namePrefix": name_prefix})
+        raw_data = response.get("data", [])
+
+        # Transform the data
+        transformed_data = []
+        for item in raw_data:
+            transformed_item = {
+                "id": item.get("id"),
+                "name": item.get("name"),
+                "city": item.get("city"),
+                "country_code": item.get("countryCode"),
+                "region_code": item.get("regionCode"),
+                "latitude": item.get("latitude"),
+                "longitude": item.get("longitude"),
+            }
+            transformed_data.append(transformed_item)
+
+        return Response(transformed_data)
+
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 @api_view(["POST"])
