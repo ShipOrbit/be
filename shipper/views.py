@@ -339,22 +339,21 @@ def get_or_create_city(city_id):
         return City.objects.get(id=city_id)
     except City.DoesNotExist:
         # Step 2: Fetch from GeoDB API
-        city_data = geo_api_get(f"cities/{city_id}/locatedIn")
-
-        # Extract required data
-        name = city_data["data"]["city"]
-        region_code = city_data["data"].get("regionCode", "")
-        country_code = city_data["data"].get("countryCode", "")
-
+        # Extract required fields
+        name = city_data["name"]
+        region_code = city_data.get("regionCode", "")
+        country_code = city_data.get("countryCode", "")
+        latitude = city_data.get("latitude")
+        longitude = city_data.get("longitude")
         # Step 3: Save to DB
         city = City.objects.create(
             id=city_id,
             name=name,
             region_code=region_code,
             country_code=country_code,
+            latitude=latitude,
+            longitude=longitude,
         )
-
-        return city
 
 
 @api_view(["GET"])
