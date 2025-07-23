@@ -100,8 +100,13 @@ def password_reset_request(request):
         user.password_reset_token = reset_token
         user.save()
 
-        # TODO: Send password reset email
-        # send_password_reset_email(user, reset_token)
+        try:
+            send_password_reset_email(user, reset_token)
+        except Exception:
+            return Response(
+                {"message": "Please Try again later"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         return Response(
             {"message": "Password reset email sent successfully"},
@@ -246,5 +251,12 @@ def send_password_reset_email(user, token):
     from_email = settings.DEFAULT_FROM_EMAIL
     recipient_list = [user.email]
 
-    # send_mail(subject, message, from_email, recipient_list)
+    resend.Emails.send(
+        {
+            "from": from_email,
+            "to": recipient_list,
+            "subject": subject,
+            "html": message,
+        }
+    )
     pass
