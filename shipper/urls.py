@@ -44,18 +44,18 @@ urlpatterns = [
         name="shipment_list_create",
     ),
     path(
-        "shipper/shipments/<int:pk>/",
+        "shipper/shipments/<str:pk>/",
         ShipmentDetailView.as_view(),
         name="shipment-detail",
     ),
     # Multi-step shipment creation
     path(
-        "shipper/shipments/<int:pk>/step2/",
+        "shipper/shipments/<str:pk>/appointment/",
         ShipmentUpdateStep2View.as_view(),
         name="shipment-step2",
     ),
     path(
-        "shipper/shipments/<int:pk>/step3/",
+        "shipper/shipments/<str:pk>/finalizing/",
         ShipmentUpdateStep3View.as_view(),
         name="shipment-step3",
     ),
