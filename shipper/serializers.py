@@ -19,7 +19,6 @@ class LocationSerializer(serializers.ModelSerializer):
             "facility_name",
             "facility_address",
             "city",
-            "state",
             "zip_code",
             "contact_name",
             "phone_number",
@@ -86,38 +85,45 @@ class ShipmentListSerializer(serializers.ModelSerializer):
 class ShipmentDetailSerializer(serializers.ModelSerializer):
     """Detailed serializer for shipment CRUD operations"""
 
-    locations = LocationSerializer(many=True, read_only=True)
     total_price = serializers.ReadOnlyField()
-    user = serializers.StringRelatedField(read_only=True)
+    pickup = serializers.SerializerMethodField()
+    dropoff = serializers.SerializerMethodField()
 
     class Meta:
         model = Shipment
         fields = [
             "id",
-            "user",
             "status",
             "equipment",
-            "pickup_location",
-            "dropoff_location",
-            "pickup_date",
-            "dropoff_date",
+            "pickup",
+            "dropoff",
             "base_price",
             "driver_assist",
             "driver_assist_fee",
             "miles",
             "min_transit_time",
-            "covid_relief",
             "reference_number",
             "weight",
             "commodity",
             "packaging",
             "packaging_type",
             "total_price",
-            "locations",
             "created_at",
             "updated_at",
         ]
         read_only_fields = ["id", "user", "created_at", "updated_at"]
+
+    def get_pickup(self, obj):
+        pickup = obj.locations.filter(location_type="pickup").first()
+        if not pickup:
+            return None
+        return ListLocationSerializer(pickup).data
+
+    def get_dropoff(self, obj):
+        dropoff = obj.locations.filter(location_type="dropoff").first()
+        if not dropoff:
+            return None
+        return ListLocationSerializer(dropoff).data
 
     def validate(self, data):
         """Cross-field validation"""
@@ -192,22 +198,21 @@ class ShipmentCreateSerializer(serializers.ModelSerializer):
 class ShipmentUpdateStep2Serializer(serializers.ModelSerializer):
     """Serializer for updating shipment with facility info (Step 2)"""
 
-    pickup_location_data = LocationSerializer(write_only=True, required=False)
-    dropoff_location_data = LocationSerializer(write_only=True, required=False)
+    pickup = LocationSerializer(write_only=True, required=False)
+    dropoff = LocationSerializer(write_only=True, required=False)
 
     class Meta:
         model = Shipment
         fields = [
-            "covid_relief",
             "driver_assist",
-            "pickup_location_data",
-            "dropoff_location_data",
+            "pickup",
+            "dropoff",
         ]
 
     def update(self, instance, validated_data):
         # Extract location data
-        pickup_data = validated_data.pop("pickup_location_data", None)
-        dropoff_data = validated_data.pop("dropoff_location_data", None)
+        pickup_data = validated_data.pop("pickup", None)
+        dropoff_data = validated_data.pop("dropoff", None)
 
         # Update shipment fields
         for attr, value in validated_data.items():
