@@ -170,10 +170,28 @@ class ShipmentCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         pickup_data = validated_data.pop("pickup")
         dropoff_data = validated_data.pop("dropoff")
+        equipment = validated_data.get("equipment")
+
+        pickup_city = pickup_data["city"]
+        dropoff_city = dropoff_data["city"]
+        try:
+            price_data = PriceCalculation.objects.get(
+                pickup_location=pickup_city,
+                dropoff_location=dropoff_city,
+                equipment=equipment,
+            )
+        except PriceCalculation.DoesNotExist:
+            raise serializers.ValidationError(
+                "Price calculation for this route and equipment does not exist."
+            )
 
         # Create Shipment
         shipment = Shipment.objects.create(
-            user=self.context["request"].user, **validated_data
+            user=self.context["request"].user,
+            **validated_data,
+            base_price=price_data.base_price,
+            miles=price_data.miles,
+            min_transit_time=price_data.min_transit_time,
         )
 
         # Create Pickup Location
