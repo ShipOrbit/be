@@ -22,6 +22,7 @@ class User(AbstractUser):
     email_verification_token = models.CharField(max_length=100, blank=True, null=True)
     password_reset_token = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    stripe_customer_id = models.CharField(null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = "email"
