@@ -71,12 +71,6 @@ urlpatterns = [
         update_shipment_status,
         name="update-shipment-status",
     ),
-    # Status history
-    path(
-        "shipper/shipments/<int:shipment_id>/history/",
-        ShipmentStatusHistoryView.as_view(),
-        name="shipment-status-history",
-    ),
     # Dashboard
     path("shipper/shipments/dashboard/", shipment_dashboard, name="shipment-dashboard"),
     path("invoices/", views.InvoiceListCreateView.as_view(), name="invoices"),

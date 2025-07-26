@@ -372,15 +372,6 @@ class DistancePriceResponseSerializer(serializers.Serializer):
     total_price_with_assist = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
-class ShipmentStatusHistorySerializer(serializers.ModelSerializer):
-    changed_by = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = ShipmentStatusHistory
-        fields = "__all__"
-        read_only_fields = ["changed_by", "created_at"]
-
-
 class ShippingNeedsSerializer(serializers.ModelSerializer):
     company_location = serializers.CharField(write_only=True)
     mode = serializers.ListField(child=serializers.CharField())

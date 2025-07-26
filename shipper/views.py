@@ -220,19 +220,6 @@ def update_shipment_status(request, shipment_id):
     return Response(serializer.data)
 
 
-class ShipmentStatusHistoryView(generics.ListAPIView):
-    """Get status history for a shipment"""
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = ShipmentStatusHistorySerializer
-
-    def get_queryset(self):
-        shipment_id = self.kwargs["shipment_id"]
-        # Ensure user owns the shipment
-        shipment = get_object_or_404(Shipment, id=shipment_id, user=self.request.user)
-        return ShipmentStatusHistory.objects.filter(shipment=shipment)
-
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def shipment_dashboard(request):
