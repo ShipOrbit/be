@@ -2,7 +2,6 @@ from datetime import timedelta
 from decimal import Decimal
 
 import stripe
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
@@ -19,26 +18,21 @@ from utils.geodb import geo_api_get
 
 from .models import (
     Invoice,
-    Location,
     Payment,
     PriceCalculation,
     Shipment,
-    ShipmentStatusHistory,
 )
 from .serializers import (
     DistancePriceRequestSerializer,
     DistancePriceResponseSerializer,
     InvoiceCreateSerializer,
     InvoiceSerializer,
-    LocationSerializer,
     PaymentConfirmSerializer,
     PaymentIntentCreateSerializer,
     PaymentSerializer,
-    PriceCalculationSerializer,
     ShipmentCreateSerializer,
     ShipmentDetailSerializer,
     ShipmentListSerializer,
-    ShipmentStatusHistorySerializer,
     ShipmentUpdateStep2Serializer,
     ShipmentUpdateStep3Serializer,
     ShippingNeedsSerializer,

@@ -1,17 +1,13 @@
 from django.urls import path
+
 from . import views
 from .views import (
-    ShipmentListCreateView,
     ShipmentDetailView,
+    ShipmentListCreateView,
     ShipmentUpdateStep2View,
     ShipmentUpdateStep3View,
     calculate_distance_price,
-    update_shipment_status,
-    ShipmentStatusHistoryView,
     shipment_dashboard,
-    save_draft_shipment,
-    LocationListView,
-    price_calculation_history,
 )
 
 # App URLs (accounts/urls.py)
