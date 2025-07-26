@@ -285,15 +285,6 @@ def save_draft_shipment(request, shipment_id):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def price_calculation_history(request):
-    """Get user's price calculation history"""
-    calculations = PriceCalculation.objects.all().order_by("-created_at")[:20]
-    serializer = PriceCalculationSerializer(calculations, many=True)
-    return Response(serializer.data)
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
 def get_regions(request):
     serializer = UserSerializer(request.user)
     country_code = serializer.data["company"]["primary_ships_country"]

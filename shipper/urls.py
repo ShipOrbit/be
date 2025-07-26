@@ -85,12 +85,6 @@ urlpatterns = [
         save_draft_shipment,
         name="save-draft-shipment",
     ),
-    # Price calculation history
-    path(
-        "shipper/shipments/price-history/",
-        price_calculation_history,
-        name="price-calculation-history",
-    ),
     path("invoices/", views.InvoiceListCreateView.as_view(), name="invoices"),
     path(
         "invoices/<int:pk>/", views.InvoiceDetailView.as_view(), name="invoice-detail"
