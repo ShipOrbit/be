@@ -113,7 +113,7 @@ class ShipmentUpdateStep3View(generics.UpdateAPIView):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 def calculate_distance_price(request):
     """
     Calculate distance and pricing between two locations
@@ -323,7 +323,7 @@ def get_regions(request):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 def search_cities(request):
     name_prefix = request.GET.get("name_prefix", "")
     try:
