@@ -283,19 +283,6 @@ def save_draft_shipment(request, shipment_id):
     return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LocationListView(generics.ListAPIView):
-    """List locations for a specific shipment"""
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = LocationSerializer
-
-    def get_queryset(self):
-        shipment_id = self.kwargs["shipment_id"]
-        # Ensure user owns the shipment
-        shipment = get_object_or_404(Shipment, id=shipment_id, user=self.request.user)
-        return Location.objects.filter(shipment=shipment)
-
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def price_calculation_history(request):

@@ -85,12 +85,6 @@ urlpatterns = [
         save_draft_shipment,
         name="save-draft-shipment",
     ),
-    # Locations
-    path(
-        "shipper/shipments/<int:shipment_id>/locations/",
-        LocationListView.as_view(),
-        name="shipment-locations",
-    ),
     # Price calculation history
     path(
         "shipper/shipments/price-history/",
