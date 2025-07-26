@@ -189,37 +189,6 @@ def calculate_distance_price(request):
         )
 
 
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def update_shipment_status(request, shipment_id):
-    """Update shipment status and log the change"""
-    shipment = get_object_or_404(Shipment, id=shipment_id, user=request.user)
-    new_status = request.data.get("status")
-    reason = request.data.get("reason", "")
-
-    if new_status not in dict(Shipment.STATUS_CHOICES):
-        return Response({"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
-
-    old_status = shipment.status
-
-    if old_status != new_status:
-        # Log status change
-        ShipmentStatusHistory.objects.create(
-            shipment=shipment,
-            old_status=old_status,
-            new_status=new_status,
-            changed_by=request.user,
-            change_reason=reason,
-        )
-
-        # Update shipment
-        shipment.status = new_status
-        shipment.save()
-
-    serializer = ShipmentDetailSerializer(shipment)
-    return Response(serializer.data)
-
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def shipment_dashboard(request):

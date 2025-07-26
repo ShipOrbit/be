@@ -65,12 +65,6 @@ urlpatterns = [
         calculate_distance_price,
         name="calculate-distance-price",
     ),
-    # Update status
-    path(
-        "shipper/shipments/<int:shipment_id>/status/",
-        update_shipment_status,
-        name="update-shipment-status",
-    ),
     # Dashboard
     path("shipper/shipments/dashboard/", shipment_dashboard, name="shipment-dashboard"),
     path("invoices/", views.InvoiceListCreateView.as_view(), name="invoices"),
