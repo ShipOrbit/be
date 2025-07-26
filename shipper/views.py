@@ -268,21 +268,6 @@ def shipment_dashboard(request):
     )
 
 
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def save_draft_shipment(request, shipment_id):
-    """Save shipment as draft to finish later"""
-    shipment = get_object_or_404(Shipment, id=shipment_id, user=request.user)
-
-    # Update any provided fields
-    serializer = ShipmentDetailSerializer(shipment, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Draft saved successfully"})
-
-    return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_regions(request):

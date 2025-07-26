@@ -79,12 +79,6 @@ urlpatterns = [
     ),
     # Dashboard
     path("shipper/shipments/dashboard/", shipment_dashboard, name="shipment-dashboard"),
-    # Save as draft
-    path(
-        "shipper/shipments/<int:shipment_id>/save-draft/",
-        save_draft_shipment,
-        name="save-draft-shipment",
-    ),
     path("invoices/", views.InvoiceListCreateView.as_view(), name="invoices"),
     path(
         "invoices/<int:pk>/", views.InvoiceDetailView.as_view(), name="invoice-detail"
