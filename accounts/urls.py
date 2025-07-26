@@ -7,7 +7,6 @@ app_name = "accounts"
 urlpatterns = [
     # Authentication
     path("auth/register/", views.register, name="register"),
-    # path('auth/register/step-2/', views.register_step_two, name='register_step_two'),
     path("auth/login/", views.login_view, name="login"),
     # path('auth/logout/', views.logout_view, name='logout'),
     # Password Reset

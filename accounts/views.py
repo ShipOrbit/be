@@ -15,7 +15,6 @@ from .serializers import (
     LoginSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetSerializer,
-    # ShippingNeedsSerializer,
     UserRegistrationSerializer,
     UserSerializer,
 )
