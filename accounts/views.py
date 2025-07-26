@@ -25,9 +25,9 @@ resend.api_key = settings.RESEND_API_KEY
 
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
-def register_step_one(request):
+def register(request):
     """
-    Handle user registration (step 1)
+    Handle user registration
     """
     serializer = UserRegistrationSerializer(data=request.data)
     if serializer.is_valid():
