@@ -13,7 +13,7 @@ class User(AbstractUser):
         max_length=20,
         validators=[
             RegexValidator(
-                regex=r"^\+?[1-9]\d{1,14}$",
+                regex=r"^\+?[1-9]\d{8,14}$",
                 message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
             )
         ],

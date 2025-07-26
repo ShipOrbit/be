@@ -41,7 +41,7 @@ class LocationSerializer(serializers.ModelSerializer):
     def validate_phone_number(self, value):
         if value:
             # Basic phone number validation
-            phone_pattern = r"^\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})$"
+            phone_pattern = r"^\+?[1-9]\d{8,14}$"
             if not re.match(phone_pattern, value):
                 raise serializers.ValidationError("Invalid phone number format")
         return value
