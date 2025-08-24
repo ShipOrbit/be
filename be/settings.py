@@ -161,25 +161,6 @@ GEODB_BASE_URL = "https://wft-geo-db.p.rapidapi.com/v1/geo"
 # Frontend URL (for email links)
 FRONTEND_URL = config("FRONTEND_URL", "http://127.0.0.1:5173")
 
-# Logging
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "django.log",
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["file"],
-            "level": "INFO",
-            "propagate": True,
-        },
-    },
-}
 
 # Stripe
 STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
